@@ -7,6 +7,11 @@
 
 #include <string.h>
 
+/* swap macros */
+#define swap_int(X, Y) ((X) ^= (Y), (Y) ^= (X), (X) ^= (Y))
+#define swap(TYPE, X, Y) do { TYPE swap_tmp = X; (X) = (Y); (Y) = swap_tmp; } while (0)
+#define swap_ptr(X, Y) swap(void *, (X), (Y))
+
 /* simple hash function */
 size_t hash(void *key, size_t key_byte) {
   size_t h = 0, i;
@@ -159,27 +164,12 @@ risu_map_node *erase_risu_map(risu_map *map, risu_map_node *i) {
 
 void swap_risu_map(risu_map *map, risu_map *target) {
   size_t i;
-  risu_map_node *tmp;
-  map->key_byte ^= target->key_byte;
-  target->key_byte ^= map->key_byte ^ target->key_byte;
-  map->key_byte ^= target->key_byte;
-  map->value_byte ^= target->value_byte;
-  target->value_byte ^= map->value_byte ^ target->value_byte;
-  map->value_byte ^= target->value_byte;
-  map->size ^= target->size;
-  target->size ^= map->size ^ target->size;
-  map->size ^= target->size;
-  for (i = 0; i < RISUCONT_MAP_BUCKET_SIZE; ++i) {
-    tmp = map->bucket[i];
-    map->bucket[i] = target->bucket[i];
-    target->bucket[i] = tmp;
-  }
-  tmp = map->front;
-  map->front = target->front;
-  target->front = tmp;
-  tmp = map->back;
-  map->back = target->back;
-  target->back = tmp;
+  swap_int(map->key_byte, target->key_byte);
+  swap_int(map->value_byte, target->value_byte);
+  swap_int(map->size, target->size);
+  for (i = 0; i < RISUCONT_MAP_BUCKET_SIZE; ++i) swap_ptr(map->bucket[i], target->bucket[i]);
+  swap_ptr(map->front, target->front);
+  swap_ptr(map->back, target->back);
 }
 
 void merge_risu_map(risu_map *map, risu_map *source) {
