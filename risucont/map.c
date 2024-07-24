@@ -54,7 +54,7 @@ risu_map *make_risu_map(size_t key_byte, size_t value_byte) {
   map->key_byte = key_byte;
   map->value_byte = value_byte;
   map->size = 0;
-  memset(map->bucket, (uintptr_t) NULL, sizeof(map->bucket));
+  memset(map->bucket, 0, sizeof(map->bucket));
   map->front = NULL;
   map->back = NULL;
   return map;
@@ -90,8 +90,9 @@ void clear_risu_map(risu_map *map) {
     free(i);
   }
   map->size = 0;
-  memset(map->bucket, (uintptr_t) NULL, sizeof(map->bucket));
+  memset(map->bucket, 0, sizeof(map->bucket));
   map->front = NULL;
+  map->back = NULL;
 }
 
 risu_map_node *insert_risu_map(risu_map *map, void *key, void *value) {
